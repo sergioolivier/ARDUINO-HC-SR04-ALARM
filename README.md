@@ -1,43 +1,29 @@
-# 🚨 Système de détection d'obstacle par ultrasons avec alarme sonore et visuelle
+# Systeme de detection d'obstacle par ultrasons avec alarme
 
-[![Arduino](https://img.shields.io/badge/Arduino-Uno-00979D?style=flat-square&logo=arduino&logoColor=white)](https://www.arduino.cc/)
-[![Language](https://img.shields.io/badge/Language-C%2B%2B-blue?style=flat-square&logo=cplusplus)](https://github.com/SERGIO-OLIVIER-wink/ARDUINO-HC-SR04-ALARM)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Completed-success?style=flat-square)]()
-[![Platform](https://img.shields.io/badge/Platform-Embedded%20Systems-orange?style=flat-square)]()
+Systeme embarque de detection d'obstacles en temps reel, base sur un Arduino Uno et un capteur ultrason HC-SR04. Le principe s'inspire des systemes d'aide au stationnement automobile : le capteur mesure en continu la distance a un objet et declenche une alarme visuelle (LED) et sonore (buzzer) quand un obstacle passe sous les 20 cm.
 
-Système embarqué de détection d'obstacles en temps réel basé sur **Arduino Uno** et capteur ultrason **HC-SR04**, inspiré du principe des systèmes d'aide au stationnement automobile. Le système mesure en continu la distance à un objet et déclenche une alarme visuelle (LED rouge) et sonore (buzzer) lorsqu'un obstacle est détecté à moins de 20 cm.
+Projet realise dans le cadre de mon apprentissage en electronique embarquee, L2 Physique et Applications, Universite d'Antananarivo.
 
-> Projet réalisé dans le cadre de mon apprentissage autodidacte en électronique embarquée et systèmes microcontrôleurs — L2 Physique et Applications, Université d'Antananarivo.
-
----
-
-## 📸 Aperçu
+## Apercu
 
 | Photo 1 | Photo 2 | Photo 3 |
 |---|---|---|
 | ![Montage 1](photo1.jpg) | ![Montage 2](photo2.jpg) | ![Montage 3](photo3.jpg) |
 
-🎥 [Voir la démonstration vidéo](video.mp4)
+[Video de demonstration](video.mp4)
 
----
+## Fonctionnement
 
-## ⚙️ Fonctionnement
+Le HC-SR04 emet une impulsion ultrasonique et mesure le temps de retour de l'echo pour calculer la distance (principe du sonar) :
 
-Le capteur **HC-SR04** émet une impulsion ultrasonique et mesure le temps de retour de l'écho pour calculer la distance, selon le principe du sonar :
-**Logique du système :**
+1. Le microcontroleur declenche une impulsion de 10 microsecondes sur la broche TRIG.
+2. Le capteur emet une salve ultrasonique a 40 kHz.
+3. La broche ECHO passe a l'etat haut pendant la duree de l'aller-retour de l'onde.
+4. La duree mesuree par `pulseIn()` permet de calculer la distance.
+5. Si la distance est inferieure a 20 cm, la LED s'allume et le buzzer s'active. Sinon le systeme reste au repos.
+6. La distance est affichee en continu sur le port serie, utile pour suivre les mesures en direct.
 
-1. Le microcontrôleur déclenche une impulsion de 10 µs sur la broche `TRIG`.
-2. Le capteur émet une salve ultrasonique à 40 kHz.
-3. La broche `ECHO` passe à l'état haut pendant la durée de l'aller-retour de l'onde.
-4. La durée mesurée par `pulseIn()` permet de calculer la distance.
-5. Si la distance mesurée est **inférieure à 20 cm**, la LED s'allume et le buzzer s'active.
-6. Sinon, le système reste au repos.
-7. La distance est affichée en continu sur le port série (utile pour le débogage et le suivi en temps réel).
-
----
-
-## 🔌 Schéma de câblage
+## Cablage
 
 | Composant | Broche du composant | Broche Arduino Uno |
 |---|---|---|
@@ -46,92 +32,56 @@ Le capteur **HC-SR04** émet une impulsion ultrasonique et mesure le temps de re
 | HC-SR04 | TRIG | D9 |
 | HC-SR04 | ECHO | D10 |
 | LED | Anode (+) | D11 |
-| LED | Cathode (−) | GND (via résistance 220 Ω) |
+| LED | Cathode (-) | GND (via resistance 220 ohms) |
 | Buzzer | (+) | D13 |
-| Buzzer | (−) | GND |
+| Buzzer | (-) | GND |
 
-> ⚠️ Une résistance de protection (220 Ω – 330 Ω) est recommandée en série avec la LED pour limiter le courant.
+Une resistance de 220 a 330 ohms est recommandee en serie avec la LED pour limiter le courant.
 
----
+## Materiel requis
 
-## 🧰 Matériel requis
+- 1 Arduino Uno (ou compatible)
+- 1 capteur ultrason HC-SR04
+- 1 LED
+- 1 buzzer actif 5V
+- 1 resistance 220-330 ohms
+- Cables de connexion
+- 1 breadboard
 
-- 1 × Arduino Uno (ou compatible)
-- 1 × Capteur ultrason HC-SR04
-- 1 × LED (couleur libre)
-- 1 × Buzzer actif 5V
-- 1 × Résistance 220 Ω – 330 Ω
-- Câbles de connexion (jumper wires)
-- 1 × Breadboard
+## Code
 
----
+Le programme complet est dans [`ultrasonic_alarm.ino`](ultrasonic_alarm.ino).
 
-## 💻 Code source
+Un timeout de 30 ms est applique a `pulseIn()` pour eviter que le programme se bloque si aucun echo ne revient (objet hors de portee).
 
-Le programme complet se trouve dans [`ultrasonic_alarm.ino`](ultrasonic_alarm.ino).
+## Installation
 
-**Extrait — configuration des broches :**
-
-```cpp
-#define TRIG    9
-#define ECHO    10
-#define BUZZER  13
-#define LED     11
-```
-
-**Extrait — logique de déclenchement de l'alarme :**
-
-```cpp
-if (distance < 20) {
-  digitalWrite(LED, HIGH);
-  digitalWrite(BUZZER, HIGH);
-} else {
-  digitalWrite(LED, LOW);
-  digitalWrite(BUZZER, LOW);
-}
-```
-
-Un timeout de 30 ms est appliqué à `pulseIn()` afin d'éviter un blocage du programme en cas d'absence d'écho (objet hors de portée).
-
----
-
-## 🚀 Installation et utilisation
-
-1. **Câbler le circuit** selon le schéma ci-dessus.
-2. **Cloner le dépôt :**
+1. Cabler le circuit selon le schema ci-dessus.
+2. Cloner le depot :
 ```bash
-   git clone https://github.com/SERGIO-OLIVIER-wink/ARDUINO-HC-SR04-ALARM.git
+git clone https://github.com/SERGIO-OLIVIER-wink/ARDUINO-HC-SR04-ALARM.git
 ```
-3. **Ouvrir** `ultrasonic_alarm.ino` dans l'IDE Arduino.
-4. **Sélectionner** la carte (Arduino Uno) et le port série correspondant.
-5. **Téléverser** le programme sur la carte.
-6. **Ouvrir le moniteur série** (9600 bauds) pour visualiser les mesures de distance en temps réel.
+3. Ouvrir `ultrasonic_alarm.ino` dans l'IDE Arduino.
+4. Selectionner la carte (Arduino Uno) et le port serie.
+5. Televerser le programme.
+6. Ouvrir le moniteur serie (9600 bauds) pour voir les mesures de distance en direct.
 
----
+## Ameliorations possibles
 
-## 📁 Structure du dépôt
----
+Le systeme actuel fonctionne en tout ou rien (alarme declenchee ou non). Quelques pistes pour aller plus loin :
 
-## 🔭 Améliorations possibles
+- Detection par paliers avec deux LED supplementaires : vert (> 30 cm), jaune (10-30 cm), rouge + buzzer (< 10 cm)
+- Affichage de la distance sur un ecran LCD 16x2
+- Reglage du seuil de detection via un potentiometre
+- Ajout d'un servo-moteur pour faire pivoter le capteur
+- Journalisation des detections avec horodatage
 
-Le système actuel utilise une logique binaire (alarme déclenchée / non déclenchée). Plusieurs pistes d'évolution ont été identifiées pour aller plus loin :
+## Auteur
 
-- [ ] **Détection par paliers** : ajouter deux LED supplémentaires (verte et jaune) pour signaler progressivement la proximité — vert (> 30 cm), jaune (10–30 cm), rouge + buzzer (< 10 cm)
-- [ ] Affichage permanent de la distance sur un écran LCD 16×2 (sans dépendre du moniteur série)
-- [ ] Réglage du seuil de détection via un potentiomètre
-- [ ] Ajout d'un servo-moteur pour faire pivoter le capteur (balayage angulaire)
-- [ ] Journalisation des détections avec horodatage
-
----
-
-## 👤 Auteur
-
-**Sergio Olivier Rakotondravao**
-Étudiant en L2 Physique et Applications — Université d'Antananarivo, Madagascar
+Sergio Olivier Rakotondravao
+Etudiant en L2 Physique et Applications, Universite d'Antananarivo, Madagascar
 [GitHub](https://github.com/SERGIO-OLIVIER-wink)
 
----
+## Licence
 
-## 📄 Licence
-
-Ce projet est distribué sous licence [MIT](LICENSE).
+Projet distribue sous licence [MIT](LICENSE).
